@@ -8,6 +8,37 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(nav2_msgs REQUIRED)
+find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(yaml-cpp REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+
+# install directories
+install(DIRECTORY
+bt_xml launch config
+DESTINATION share/${PROJECT_NAME}
+)
+
+set(BEHAVIOR_SOURCES
+src/navigation_behaviors.cpp
+)
+
+set(TARGET_DEPENDS
+  rclcpp
+  rclcpp_action
+  nav2_msgs
+  behaviortree_cpp_v3
+  yaml-cpp
+  tf2
+  tf2_geometry_msgs
+)
+
+include_directories(include)
+add_executable(autonomy_node src/autonomy_node.cpp ${BEHAVIOR_SOURCES})
+ament_target_dependencies(autonomy_node ${TARGET_DEPENDS})
+target_link_libraries(autonomy_node ${YAML_CPP_LIBRARIES})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

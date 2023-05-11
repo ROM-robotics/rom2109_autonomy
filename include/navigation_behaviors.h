@@ -8,16 +8,16 @@
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 #include <string>
 
-class GoToPose : public BT : StateFulActionNode
+class GoToPose : public BT::StatefulActionNode
 {
 public:
-    GoToPose(const std::string &name, const BT::NodeConfiguration &config, rclcpp::Node::SharePtr node_ptr);
+    GoToPose(const std::string &name, const BT::NodeConfiguration &config, rclcpp::Node::SharedPtr node_ptr);
 
     using NavigateToPose = nav2_msgs::action::NavigateToPose;
     using GoalHandleNav = rclcpp_action::ClientGoalHandle<NavigateToPose>;
 
     rclcpp::Node::SharedPtr node_ptr_;
-    rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr;
+    rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
     bool done_flag_;
 
     // Method Overrides
@@ -25,8 +25,8 @@ public:
 
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
-    void onHalted() override();
+    void onHalted() override{};
 
     // Action client callback
-    void nav_to_pose_callback(const GoalHandleNav::WrapperResult &result);
+    void nav_to_pose_callback(const GoalHandleNav::WrappedResult &result);
 };

@@ -1,20 +1,23 @@
-#include "auto_node.hpp"
+#include "autonomy_node.hpp"
 
 using namespace std::chrono_literals;
-const std::string bt_xml_dir = ament_index_cpp::get_package_share_directory("rom2109_autonomy") + "bt_xml";
+const std::string xml_dir = ament_index_cpp::get_package_share_directory("rom2109_autonomy") + "bt_xml";
+
 AutoNode::AutoNode(const std::string &node_name) : Node(node_name)
 {
+    this->declare_parameter("location_file", "none");
     RCLCPP_INFO(get_logger(), "Init Done");
 }
 
-AutoNode::setup()
+void AutoNode::setup()
 {
+    // Initial BT setup
     create_behavior_tree();
     const auto timer_period = 500ms;
     timer_ = this->create_wall_timer(timer_period, std::bind(&AutoNode::update_behavior_tree, this));
 }
 
-AutoNode::create_behavior_tree()
+void AutoNode::create_behavior_tree()
 {
     // Create bt
     BT::BehaviorTreeFactory factory;
@@ -25,12 +28,14 @@ AutoNode::create_behavior_tree()
     BT::NodeBuilder builder = [=](const std::string &name, const BT::NodeConfiguration &config)
     {
         return std::make_unique<GoToPose>(name, config, shared_from_this());
-    } factory.registerBuilder < GoToPose("GoToPose", builder);
+    }; 
+    factory.registerBuilder<GoToPose>("GoToPose", builder);
 
-    tree_ = factory.createTreeFromFile(bt_xml_dir + "/tree.xml");
+    tree_ = factory.createTreeFromFile(xml_dir + "/tree.xml");
+    RCLCPP_INFO(get_logger(), "3");
 }
 
-AutoNode::update_behavior_tree()
+void AutoNode::update_behavior_tree()
 {
     BT::NodeStatus tree_status = tree_.tickRoot();
 
