@@ -5,6 +5,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+set(CMAKE_CXX_STANDARD 17)
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -39,6 +40,11 @@ include_directories(include)
 add_executable(autonomy_node src/autonomy_node.cpp ${BEHAVIOR_SOURCES})
 ament_target_dependencies(autonomy_node ${TARGET_DEPENDS})
 target_link_libraries(autonomy_node ${YAML_CPP_LIBRARIES})
+
+install(TARGETS
+  autonomy_node
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
